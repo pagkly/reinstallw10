@@ -49,9 +49,16 @@ set "winpythonexe=winpython.exe"
 set "matlabinstallerlink="
 set matlabexe=matlab.zip
 REM regkey
-set "windefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
+set "regwindefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
 set "regdarkmodedir=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
 set regdarkmodekey=AppsUseLightTheme
+set regdevmodedir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock
+set regdevmodekey=AllowDevelopmentWithoutDevLicense
+set "regimfeodir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options"
+set "npadexe=notepad.exe"
+set nppdir="C:\Program Files\Notepad++"
+set "nppexe=notepad++.exe"
+
 
 set psldir=%SystemRoot%
 set pslexe=powershell.exe
@@ -72,40 +79,7 @@ set tpbldir=%tpdir%\%blexe%
 set tppldir=%tpdir%\%plexe%
 set exe2dir=%userdocdir%\winreinstall\EXE2
 goto:EOF
-:updatethisregkey
-set KEY_NAME=%1
-set VALUE_NAME=%2
-set keytype=%3
-set valto=%4
-set keyname=%5
-FOR /F "usebackq skip=2 tokens=1-3" %%A IN (`REG QUERY %KEY_NAME% /v %VALUE_NAME% 2^>nul`) DO (
-    set ValueName=%%A
-    set ValueType=%%B
-    set ValueValue=%%C
-)
-REM if defined ValueName (
-REM    @echo Value Name = %ValueName%
-REM    @echo Value Type = %ValueType%
-REM    @echo Value Value = %ValueValue%
-REM ) else (
-REM    @echo %KEY_NAME%\%VALUE_NAME% not found.
-REM )
-if defined ValueName (
-if defined valto (
-if %ValueValue% == %valto% (
-echo alrsame
-) else (
-echo changevalto %valto%
-reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
-)
-)
-) else (
-@echo %KEY_NAME%\%VALUE_NAME% not found; creating one
-reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
-)
-goto:EOF
 :selfelevateasadmin
-REM /savecred
 runas /user:administrator /savecred "%DIR0%"
 goto:EOF
 :elevatecmd
@@ -121,14 +95,15 @@ goto:EOF
 :deletestrafter
 REM https://stackoverflow.com/questions/24735624/removing-everything-after-specific-character-in-batch
 set FULLNAME=%1
-set ENDTEXT=!FULLNAME:*E0=!
+REM set ENDTEXT=!FULLNAME:*E0=!
+set ENDTEXT=%2
 call set TRIMMEDNAME=%%FULLNAME:!ENDTEXT!=%%
 echo !TRIMMEDNAME!
 goto:EOF
 :getstrlastdlink
 REM https://stackoverflow.com/questions/47796707/how-to-extract-text-after-in-batch-file
-REM set windefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths
-REM set "str=%windefexcdir%"
+REM set regwindefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths
+REM set "str=%regwindefexcdir%"
 set "str=%~1"
 if not defined str goto endParams
 for %%a in (%str:/= %) do set result=%%a
@@ -169,9 +144,15 @@ netsh firewall add allowedprogram "%1%" >nul
 goto:EOF
 :addexctodefender
 REM https://blogs.technet.microsoft.com/heyscriptingguy/2016/02/14/powertip-add-exclusion-folder-to-windows-defender-using-powershell/
+set KEY_NAME=
+set VALUE_NAME=
+set ValueName=
+set ValueType=
+set ValueValue=
 set dir=%1
-set "KEY_NAME=%windefexcdir%"
+set "KEY_NAME=%regwindefexcdir%"
 set "VALUE_NAME=%dir%"
+REG QUERY "%KEY_NAME%" /v "%VALUE_NAME%"
 FOR /F "usebackq skip=2 tokens=1-3" %%A IN (`REG QUERY "%KEY_NAME%" /v "%VALUE_NAME%" 2^>nul`) DO (
     set ValueName=%%A
     set ValueType=%%B
@@ -186,17 +167,19 @@ REM    @echo %KEY_NAME%\%VALUE_NAME% not found.
 REM )
 if defined ValueName (
 echo %dir% excluded in windef
-REM powershell.exe -Command "Remove-MpPreference -ExclusionPath '%dir%'"
 ) else (
 @echo %KEY_NAME%\%VALUE_NAME% not found
-powershell.exe -Command "Add-MpPreference -ExclusionPath '%dir%'"
+REM powershell.exe -Command "Add-MpPreference -ExclusionPath '%dir%'"
+Powershell.exe -Command "& {Start-Process Powershell.exe -ArgumentList 'Add-MpPreference -ExclusionPath "%dir%"' -Verb RunAs}"
+echo %dir% added
 )
+REM powershell -inputformat none -outputformat none -NonInteractive -Command Add-MpPreference -ExclusionPath $ENV:USERPROFILE\Downloads
 goto:EOF
 :addexctodefender2
 set dir=%1
 set keytype=REG_SZ
 set keyval=0x0
-call :updatethisregkey %windefexcdir% %dir% %keytype% %keyval% dirdef
+call :updatethisregkey %regwindefexcdir% %dir% %keytype% %keyval% dirdef
 echo %dir% added
 call :sleep 600
 goto:EOF
@@ -224,6 +207,61 @@ set dir=%1
 goto:EOF
 :extractzip
 .\7zip.exe %zipdir%
+goto:EOF
+
+:updatethisregkey
+set KEY_NAME=
+set VALUE_NAME=
+set keytype=
+set "valto="
+set "keyname="
+set ValueName=
+set ValueType=
+set ValueValue=
+
+set KEY_NAME=%1
+set VALUE_NAME=%2
+set keytype=%3
+set "valto=%4"
+set keyname=%5
+echo %KEY_NAME%
+FOR /F "usebackq skip=2 tokens=1-3" %%A IN (`REG QUERY %KEY_NAME% /v %VALUE_NAME% 2^>nul`) DO (
+set ValueName=%%A
+set ValueType=%%B
+set ValueValue=%%C
+)
+REG QUERY %KEY_NAME% /v %VALUE_NAME%
+if defined ValueName (
+@echo Value Name = %ValueName%
+@echo Value Type = %ValueType%
+@echo Value Value = %ValueValue%
+) else (
+@echo %KEY_NAME%\%VALUE_NAME% not found.
+)
+
+if defined ValueName (
+echo %KEY_NAME%\%VALUE_NAME% exists
+REM call :sleep 600
+if defined valto (
+echo curvalue:%ValueValue%
+if %ValueValue% == %valto% (
+echo alrsame
+) else (
+echo notsamesochangevalto:%valto%
+REM call :removethisregkey %KEY_NAME% %VALUE_NAME%
+reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
+)
+)
+
+) else (
+REM echo %KEY_NAME%\%VALUE_NAME% not found; creating one
+reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
+)
+goto:EOF
+:removethisregkey
+set KEY_NAME=%1
+set VALUE_NAME=%2
+reg delete %KEY_NAME% /v %VALUE_NAME% /f
 goto:EOF
 
 
@@ -301,16 +339,11 @@ goto:EOF
 ::regedit
 REM http://www.thewindowsclub.com/fix-cant-install-windows-usb-flash-drive-setup-upgrading-windows-8-1.
 :enabledarkmode
-set keytype=REG_SZ
-set valto=0x1
+set keytype=REG_DWORD
+set "valto=0x0"
 set dmname=dm
 reg query %regdarkmodedir% /v %regdarkmodekey%
-if %ERRORLEVEL% equ 0 (
 call :updatethisregkey %regdarkmodedir% %regdarkmodekey% %keytype% %valto% %dmname% 
-) else (
-call :updatethisregkey %regdarkmodedir% %regdarkmodekey% %keytype% %valto% %dmname% 
-)
-call :sleep 600
 goto:choosenow
 :enabledevmode
 powershell New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -PropertyType DWORD -Value 1 -Force
@@ -365,12 +398,15 @@ goto:choosenow
 call :checkapprunningnrun %egldir% %eglexe%
 goto:choosenow
 :regswitchnpp
-set "regexec=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options"
-set "npadexe=notepad.exe"
+set "key=%regimfeodir%\%npadexe%"
 set keyname=Debugger
 set keytype=REG_SZ
-set "npval=C:\Program Files\Notepad++\notepad++.exe"
-call :updatethisregkey "%regexec%\%npadexe%" %keyname% %keytype% %npval%
+set "npval=C:\"Program Files"\Notepad++\notepad++.exe"
+REM call :removethisregkey "%regexec%\%npadexe%" %keyname%
+REM call :sleep 600
+echo %regimfeodir%\%npadexe%
+REM call :sleep 600
+call :updatethisregkey "%key%" %keyname% %keytype% "%npval%"
 goto:EOF
 :setdefaultapps
 REM https://superuser.com/questions/362063/how-to-associate-a-file-with-a-program-in-windows-via-cmd
@@ -401,6 +437,19 @@ netsh interface ip set address name="Ethernet 5" static 192.168.1.%1 255.255.255
 netsh interface ip set dns name="Ethernet 5" static 192.168.1.83
 netsh interface ip add dns name="Ethernet 5" 8.8.8.8 index=2
 goto:EOF
+:addmanualwindefexclusiondir
+set "KEY_NAME=%regwindefexcdir%"
+REG QUERY "%KEY_NAME%"
+set /p dir="Enter DIR: "
+call :addexctodefender %dir%
+goto:choosenow
+:removemanualwindefexclusiondir
+set "KEY_NAME=%regwindefexcdir%"
+REG QUERY "%KEY_NAME%"
+set /p dir="Enter DIR: "
+REM powershell.exe -Command "Remove-MpPreference -ExclusionPath '%dir%'"
+Powershell.exe -Command "& {Start-Process Powershell.exe -ArgumentList 'Remove-MpPreference -ExclusionPath "%dir%"' -Verb RunAs}"
+goto:choosenow
 
 
 ::FNENGINE
@@ -428,6 +477,9 @@ for /f "tokens=* delims=" %%x in ('findstr /r /i ^
 /c:"^:updatethisregkey" ^
 /c:"^:enabledarkmode" ^
 /c:"^:staticinetcompno" ^
+/c:"^:addmanualwindefexclusiondir" ^
+/c:"^:removemanualwindefexclusiondir" ^
+/c:"^:regswitchnpp" ^
 /c:"^:testecho" ^
 /c:"^:testlinkd" ^
 /c:"^:testelif" ^
@@ -518,27 +570,20 @@ goto:EOF
 :testlinkd
 call :getstrlastdlink "%nvidiadinstallerlink%" "/"
 echo result:%result%
-call :getstrlastdlink "%winpythoninstallerlink%" "/"
+call :deletestrafter %result% .exe
+REM call :getstrlastdlink2 "%nvidiadinstallerlink%" "/"
+REM echo result:%result%
+REM echo bla0:%winpythoninstallerlink%
+
+set "winpythoninstallerlink=https://sourceforge.net/settings/mirror_choices?projectname=winpython^&filename=WinPython_3.6/3.6.5.0/WinPython64-3.6.5.0Qt5.exe^&selected=jaist"
+REM for %%a in ("%winpythoninstallerlink%") do echo bla:%%~a
+echo bla2:%winpythoninstallerlink%
+call :deletestrafter %winpythoninstallerlink% "selected=jaist"
+set result=
+call :getstrlastdlink %winpythoninstallerlink%
 echo result:%result%
-call :deletestrafter %result% "jaist"
-goto:EOF
-:testregkey
-set windefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths
-set regdarkmodedir=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize
-set regdarkmodekey=AppsUseLightTheme
-set KEY_NAME=%windefexcdir%
-set KEY_NAME=%regdarkmodedir%
-set VALUE_NAME=C:\Users\user\Downloads
-set dir=%VALUE_NAME%
-set keytype=REG_DWORD
-set valto=0x0
-set dmname=dm
-set bladir=%KEY_NAME%\%VALUE_NAME%
-reg add "%KEY_NAME%" /v "%VALUE_NAME%" /t %keytype% /d %valto% /f
-reg delete "%KEY_NAME%" /v "%VALUE_NAME%" /f
-powershell.exe -Command "Add-MpPreference -ExclusionPath '%dir%'"
-powershell.exe -Command "Remove-MpPreference -ExclusionPath '%dir%'"
-powershell -inputformat none -outputformat none -NonInteractive -Command Add-MpPreference -ExclusionPath $ENV:USERPROFILE\Downloads
+REM echo wplink:%wplink%
+REM call :deletestrafter %result% "jaist"
 goto:EOF
 :testnewregkey
 REM https://www.lifewire.com/how-to-create-edit-and-use-reg-files-2622817
@@ -551,4 +596,99 @@ set keytype=REG_SZ
 set valto=0x1
 set dmname=bogus
 call :updatethisregkey %regdarkmodedir% %regdarkmodekey% %keytype% %valto% %dmname%
+goto:choosenow
+
+:testupdatewdir
+set "regwindefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
+set "regdarkmodedir=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+set regdarkmodekey=AppsUseLightTheme
+set regdevmodedir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock
+set regdevmodekey=AllowDevelopmentWithoutDevLicense
+set "regimfeodir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options"
+set "npadexe=notepad.exe"
+set nppdir="C:\Program Files\Notepad++"
+set "nppexe=notepad++.exe"
+
+set KEY_NAME=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize &&
+set VALUE_NAME="AppsUseLightTheme" &&
+set keytype=REG_DWORD &&
+set valto=0x0 &&
+reg delete %KEY_NAME% /v %VALUE_NAME% /f &&
+reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
+
+set KEY_NAME=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize &&
+set VALUE_NAME="AppsUseLightTheme" &&
+set VALUE_NAME="C:\Program Files\Notepad++\notepad++.exe" &&
+set keytype=REG_SZ &&
+set valto="C:\\Program Files\\Notepad++\\notepad++.exe" &&
+reg delete %KEY_NAME% /v %VALUE_NAME% /f &&
+reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
+
+set KEY_NAME=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock &&
+set VALUE_NAME="AllowDevelopmentWithoutDevLicense" &&
+set keytype=REG_DWORD &&
+set valto="1" &&
+reg delete %KEY_NAME% /v %VALUE_NAME% /f &&
+reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
+
+set KEY_NAME="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths" &&
+set VALUE_NAME="C:\Users\user\Desktop" &&
+set keytype=REG_DWORD &&
+set valto="0" &&
+reg delete %KEY_NAME% /v %VALUE_NAME% /f ;
+reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
+
+set VALUE_NAME="C:\Program Files\Notepad++\notepad++.exe" &&
+set valto='C:\\Program Files\\Notepad++\\notepad++.exe' &&
+goto:EOF
+:testupdatethisregkey2
+set KEY_NAME=
+set VALUE_NAME=
+set keytype=
+set "valto="
+set "keyname="
+set ValueName=
+set ValueType=
+set ValueValue=
+
+set KEY_NAME=%1
+set VALUE_NAME=%2
+set keytype=%3
+set "valto=%4"
+set keyname=%5
+echo %KEY_NAME%
+FOR /F "usebackq skip=2 tokens=1-3" %%A IN (`REG QUERY %KEY_NAME% /v %VALUE_NAME% 2^>nul`) DO (
+set ValueName=%%A
+set ValueType=%%B
+set ValueValue=%%C
+)
+REM REG QUERY %KEY_NAME% /v %VALUE_NAME%
+if defined ValueName (
+@echo Value Name = %ValueName%
+@echo Value Type = %ValueType%
+@echo Value Value = %ValueValue%
+) else (
+@echo %KEY_NAME%\%VALUE_NAME% not found.
+)
+
+echo current: %KEY_NAME% /v %ValueName% /t %ValueType% /d %ValueValue% /f
+call :sleep 600
+if defined ValueName (
+echo %KEY_NAME%\%VALUE_NAME% exists
+if defined valto (
+echo curvalue:%ValueValue%
+if %ValueValue% == %valto% (
+echo alrsame
+) else (
+echo notsamesochangevalto:%valto%
+REM call :removethisregkey %KEY_NAME% %VALUE_NAME%
+reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
+)
+)
+
+) else (
+echo %KEY_NAME%\%VALUE_NAME% not found; creating one
+call :sleep 600
+reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
+)
 goto:choosenow
