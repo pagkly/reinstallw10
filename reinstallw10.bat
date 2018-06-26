@@ -330,34 +330,71 @@ goto:EOF
 :installoffice16
 goto:EOF
 ::REINSTALL
-:reinstallw10SP3
-call :updateregkey
+:rw10common
+call :enableportablemode
+call :enabledevmode
+call :enabledarkmode
+call :exclusionwindef
+call :disablefirewall
+call :disablehyperv
+call :disablecortana
+call :wincleanup
+
 call :downloadallapps
+call :installchrome
+call :installnpp
+call :installwxhexeditor
+call :installoffice16
+call :installpython
+call :installubuntuwsl
+call :updatewsl
+
 wsl
-ubuntu -c "sudo apt-get update"
+wsl "sudo apt-get update"
+wsl "sudo apt-get install -y gedit"
+:reinstallw10SP3
+call :rw10common
+call :downloadallapps
+call :installallapps
 goto:EOF
 :reinstallw10g
 REM https://answers.microsoft.com/en-us/windows/forum/windows_10-update-winpc/you-cant-install-windows-on-a-usb-flash-drive/003a982e-aa32-49ad-8bf5-e7e83d488c63
 REM call :updateregkey "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlset\Control" "1"
+call :rw10common
+call :installwslgedit
+call :installmatlab
+call :installdockerce
+call :installahk
+call :installandroidstudio
+call :installatom
+call :installgithubdesktop
+
+REM games
+call :installnvidiadriver
+call :installfortnite
+call :installteknoparrot
+call :installucr
+call :installtgb
+call :uninstallbloatgame
 goto:EOF
 ::download
+:downloadallappscommon
+call :download "!chromeinstallerlink!" "%downloaddir%\%chromeexe%"
+call :download "%nppinstallerlink%" "%downloaddir%\%nppfile%"
+call :download "%wxhexeditorinstallerlink%" "%downloaddir%\%wxhexfile%"
+call :download "%adbtoolsapp%" "%downloaddir%\%adbtoolzip%"
 :downloadallapps
 echo %chromeinstallerlink%
 echo "!nvidiadinstallerlink!"
 call :download "!nvidiadinstallerlink!" "%downloaddir%\%nvidiadexe%"
 call :sleep 600
-call :download "!chromeinstallerlink!" "%downloaddir%\%chromeexe%"
-call :download "%nppinstallerlink%" "%downloaddir%\%nppfile%"
-call :download "%wxhexeditorinstallerlink%" "%downloaddir%\%wxhexfile%"
 call :download "!nvidiadinstallerlink!" "%downloaddir%\%nvidiadexe%"
 call :sleep 600
-call :download "%adbtoolsapp%" "%downloaddir%\%adbtoolzip%"
 call :download "%teknopinstallerlink%" "%downloaddir%\%teknopzip%"
 call :download "%ucrinstallerlink%" "%downloaddir%\%ucrzip%"
 call :download "%ahkinstallerlink%" "%downloaddir%\%ahkexe%"
 call :download "%winpythoninstallerlink%" "%downloaddir%\%winpythonexe%"
 call :download "%matlabinstallerlink%" "%downloaddir%\%matlabexe%"
-call :download "!nvidiadinstallerlink!" "%downloaddir%\%nvidiadexe%"
 goto:EOF
 REM https://www.digitalcitizen.life/six-ways-removeuninstall-windows-programs-and-apps
 :listallinstalledapps
@@ -493,6 +530,7 @@ ftype MPC-BE.AssocFile.MKV=c:\Program Files\MPC-BE x64\mpc-be64.exe "%1"pause
 ftype TIFImage.Document="C:\Program Files\MSPVIEW.exe" "%1"
 goto:EOF
 :wslgedit
+REM https://stackoverflow.com/questions/1449188/running-windows-batch-file-commands-asynchronously
 set filedir1=%1
 REM wsl export DISPLAY=:0 ; nohup gedit %filedir1% &
 start /b cmd /c "wsl export DISPLAY=:0 ; nohup gedit %filedir1% &"
