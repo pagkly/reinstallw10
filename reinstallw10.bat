@@ -129,6 +129,11 @@ set cppldir=%exe2dir%\%plexe%
 set tpbldir=%tpdir%\%blexe%
 set tppldir=%tpdir%\%plexe%
 set exe2dir=%userdocdir%\winreinstall\EXE2
+
+REM set rw10scriptdir="/mnt/c/Users/user/Documents/winreinstall/script/reinstallw10.bat"
+set rw10scriptdir="/mnt/c/Users/user/Documents/GitHub/reinstallw10/reinstallw10.bat"
+set mb1ms="/mnt/d/notes/Documentsv2/1mstart2"
+set mb3gs="/mnt/d/notes/3gsnit"
 goto:EOF
 :selfelevateasadmin
 runas /user:administrator /savecred "%DIR0%"
@@ -319,7 +324,8 @@ set VALUE_NAME=%2
 reg delete %KEY_NAME% /v %VALUE_NAME% /f
 goto:EOF
 
-
+:installoffice16
+goto:EOF
 ::REINSTALL
 :reinstallw10SP3
 call :updateregkey
@@ -358,11 +364,16 @@ REM msiexec /x
 REM ReturnValue=0 and a message saying “Method execution successful.”
 echo y | wmic product where name="%1" call uninstall.
 :uninstallgamepreinstalled
+
+powershell.exe Get-AppxPackage *CandyCrush* | Remove-AppxPackage &&
+powershell.exe Get-AppxPackage *DisneyMagicKingdoms* | Remove-AppxPackage &&
+powershell.exe Get-AppxPackage *MarchofEmpires* | Remove-AppxPackage &&
+powershell.exe Get-AppxPackage *BubbleWitch* | Remove-AppxPackage &&
 REM "Bubble Witch 3 Saga"
 REM "Candy Crush Soda Saga"
-Get-AppxPackage *CandyCrush* | Remove-AppxPackage
 REM "Disney Magic Kingdoms"
 REM "March of Emipres:War of Lords"
+goto:EOF
 
 ::installallapps
 :installchrome
@@ -473,15 +484,30 @@ onassoc .mkv=MPC-BE.AssocFile.MKV
 ftype MPC-BE.AssocFile.MKV=c:\Program Files\MPC-BE x64\mpc-be64.exe "%1"pause
 ftype TIFImage.Document="C:\Program Files\MSPVIEW.exe" "%1"
 goto:EOF
-:wsleditrw10
+:wslgedit
+set filedir1=%1
+wsl export DISPLAY=:0 ; nohup gedit %filedir1% &
+goto:EOF
+:wslgeditrw10
 REM https://blogs.msdn.microsoft.com/commandline/2017/11/28/a-guide-to-invoking-wsl/
 REM ubuntu -c [command]
 REM bash -c [command]
 REM wsl [command] (NOTE: In this case you don't append '-c', you just type in your command)
 REM ubuntu -c export DISPLAY=:0 ; nohup gedit %rw10scriptdir% & disown $!
-set rw10scriptdir="/mnt/c/Users/user/Documents/winreinstall/script/reinstallw10.bat"
-wsl export DISPLAY=:0 ; nohup gedit %rw10scriptdir% & disown $!
+call :wslgedit "%rw10scriptdir%"
 goto:EOF
+
+:wslgeditmb1ms
+call :wslgedit "%mb1ms%"
+goto:EOF
+:wslgeditmb3gs
+call :wslgedit "%mb3gs%"
+goto:EOF
+
+:wslgeditmbboth
+wsl export DISPLAY=:0 ; nohup gedit "%mb3gs%" "%mb1ms%" &
+goto:EOF
+
 :staticinetcompno
 set /p compno="Enter Compno: "
 call :setinternet "%compno%"
@@ -549,6 +575,10 @@ for /f "tokens=* delims=" %%x in ('findstr /r /i ^
 /c:"^:removemanualwindefexclusiondir" ^
 /c:"^:regswitchnpp" ^
 /c:"^:seeregedit" ^
+/c:"^:wslgeditrw10" ^
+/c:"^:wslgeditmb1ms" ^
+/c:"^:wslgeditmb3gs" ^
+/c:"^:wslgeditmbboth" ^
 /c:"^:testecho" ^
 /c:"^:testlinkd" ^
 /c:"^:testelif" ^
@@ -759,3 +789,27 @@ call :sleep 600
 reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
 )
 goto:choosenow
+
+:projects
+reinstallw10
+reinstallw10g
+mstart2
+ubuntu resquash
+ubuntu reinstall
+
+python ocv
+python receipt
+python scanning from photos
+voice assistant?
+
+backup tgb
+
+portingandroid
+projectsrasbpi
+projectandroidemulator
+projectupcycleandroid
+projectusbducky
+projectbatterylabeling
+project3dprinterusbcover
+project3dpspecs
+goto:EOF
