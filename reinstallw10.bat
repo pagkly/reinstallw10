@@ -1,4 +1,55 @@
 @echo off
+REM https://stackoverflow.com/questions/7044985/how-can-i-auto-elevate-my-batch-file-so-that-it-requests-from-uac-administrator
+REM selfelevated
+ CLS
+ ECHO.
+ ECHO =============================
+ ECHO Running Admin shell
+ ECHO =============================
+
+:init
+ setlocal DisableDelayedExpansion
+ set cmdInvoke=1
+ set winSysFolder=System32
+ set "batchPath=%~0"
+ for %%k in (%0) do set batchName=%%~nk
+ set "vbsGetPrivileges=%temp%\OEgetPriv_%batchName%.vbs"
+ setlocal EnableDelayedExpansion
+
+:checkPrivileges
+  NET FILE 1>NUL 2>NUL
+  if '%errorlevel%' == '0' ( goto gotPrivileges ) else ( goto getPrivileges )
+
+:getPrivileges
+  if '%1'=='ELEV' (echo ELEV & shift /1 & goto gotPrivileges)
+  ECHO.
+  ECHO **************************************
+  ECHO Invoking UAC for Privilege Escalation
+  ECHO **************************************
+
+  ECHO Set UAC = CreateObject^("Shell.Application"^) > "%vbsGetPrivileges%"
+  ECHO args = "ELEV " >> "%vbsGetPrivileges%"
+  ECHO For Each strArg in WScript.Arguments >> "%vbsGetPrivileges%"
+  ECHO args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
+  ECHO Next >> "%vbsGetPrivileges%"
+
+  if '%cmdInvoke%'=='1' goto InvokeCmd 
+
+  ECHO UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
+  goto ExecElevation
+
+:InvokeCmd
+  ECHO args = "/c """ + "!batchPath!" + """ " + args >> "%vbsGetPrivileges%"
+  ECHO UAC.ShellExecute "%SystemRoot%\%winSysFolder%\cmd.exe", args, "", "runas", 1 >> "%vbsGetPrivileges%"
+
+:ExecElevation
+ "%SystemRoot%\%winSysFolder%\WScript.exe" "%vbsGetPrivileges%" %*
+ exit /B
+
+:gotPrivileges
+ setlocal & cd /d %~dp0
+ if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
+
 cd \ && cd windows\system32
 setlocal enabledelayedexpansion enableextensions
 set userid=%USERNAME%
@@ -101,6 +152,7 @@ call set TRIMMEDNAME=%%FULLNAME:!ENDTEXT!=%%
 echo !TRIMMEDNAME!
 goto:EOF
 :getstrlastdlink
+REM https://stackoverflow.com/questions/20004597/extracting-string-after-last-instance-of-delimiter-in-a-batch-file
 REM https://stackoverflow.com/questions/47796707/how-to-extract-text-after-in-batch-file
 REM set regwindefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths
 REM set "str=%regwindefexcdir%"
@@ -137,6 +189,9 @@ REM 3powershell -c "(New-Object Net.WebClient).DownloadFile('%url%','%output%')"
 REM powershell -ExecutionPolicy RemoteSigned -File "download.ps1" "%url%" "%output%"
 certutil.exe -urlcache -split -f "%url%" "%output%"
 REM bitsadmin.exe /transfer "Downloading" %url% "%output%"
+goto:EOF
+:seeregedit
+regedit "%regwindefexcdir%"
 goto:EOF
 :addexctofirewall
 REM https://community.spiceworks.com/scripts/show/1336-add-exception-in-firewall
@@ -364,7 +419,21 @@ goto:EOF
 :downloadubuntu
 :runupdatebashc
 ubuntu -c "sudo apt-get update"
+goto:EOF
 :disablehyperv
+REM https://stackoverflow.com/questions/30496116/how-to-disable-hyper-v-in-command-line
+bcdedit /set hypervisorlaunchtype off
+REM restartlater
+goto:EOF
+:otherhypervcmd
+bcdedit /set hypervisorlaunchtype auto
+dism /online /disable-feature /featurename:microsoft-hyper-v-all
+bcdedit /copy {current} /d "Windows 10 no Hyper-V"
+find the new id of the just created "Windows 10 no Hyper-V" bootentry, eg. {094a0b01-3350-11e7-99e1-bc5ec82bc470}
+"bcdedit" and then look for identifier {XXX} in the added boot loader configuration
+bcdedit /set {094a0b01-3350-11e7-99e1-bc5ec82bc470} hypervisorlaunchtype Off
+powershell.exe Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All
+goto:EOF
 :disableportable
 ::login
 :logintounimelb
@@ -397,17 +466,6 @@ goto:choosenow
 :runeglPC
 call :checkapprunningnrun %egldir% %eglexe%
 goto:choosenow
-:regswitchnpp
-set "key=%regimfeodir%\%npadexe%"
-set keyname=Debugger
-set keytype=REG_SZ
-set "npval=C:\"Program Files"\Notepad++\notepad++.exe"
-REM call :removethisregkey "%regexec%\%npadexe%" %keyname%
-REM call :sleep 600
-echo %regimfeodir%\%npadexe%
-REM call :sleep 600
-call :updatethisregkey "%key%" %keyname% %keytype% "%npval%"
-goto:EOF
 :setdefaultapps
 REM https://superuser.com/questions/362063/how-to-associate-a-file-with-a-program-in-windows-via-cmd
 REM assoc | more
@@ -451,6 +509,16 @@ REM powershell.exe -Command "Remove-MpPreference -ExclusionPath '%dir%'"
 Powershell.exe -Command "& {Start-Process Powershell.exe -ArgumentList 'Remove-MpPreference -ExclusionPath "%dir%"' -Verb RunAs}"
 goto:choosenow
 
+:regswitchnpp
+set "key=%regimfeodir%\%npadexe%"
+set keyname=Debugger
+set keytype=REG_SZ
+set "npval=C:\Program Files\Notepad++\notepad++.exebla"
+echo "%regimfeodir%\%npadexe%"
+REM call :removethisregkey "%regexec%\%npadexe%" %keyname%
+call :updatethisregkey "%key%" %keyname% %keytype% "C:\Program Files\Notepad++\notepad++.exe"
+goto:choosenow
+
 
 ::FNENGINE
 :traprestart
@@ -480,6 +548,7 @@ for /f "tokens=* delims=" %%x in ('findstr /r /i ^
 /c:"^:addmanualwindefexclusiondir" ^
 /c:"^:removemanualwindefexclusiondir" ^
 /c:"^:regswitchnpp" ^
+/c:"^:seeregedit" ^
 /c:"^:testecho" ^
 /c:"^:testlinkd" ^
 /c:"^:testelif" ^
@@ -638,8 +707,6 @@ set valto="0" &&
 reg delete %KEY_NAME% /v %VALUE_NAME% /f ;
 reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
 
-set VALUE_NAME="C:\Program Files\Notepad++\notepad++.exe" &&
-set valto='C:\\Program Files\\Notepad++\\notepad++.exe' &&
 goto:EOF
 :testupdatethisregkey2
 set KEY_NAME=
