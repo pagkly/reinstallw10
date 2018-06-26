@@ -62,6 +62,7 @@ call :setvar
 REM call :selfelevateasadmin
 call :addexctodefender %userdocdir%
 call :addexctodefender %userdowndir%
+call :startworking &
 call :choosenow
 exit /B %ERRORLEVEL%
 REM forfiles /p "C:\what\ever" /s /m *.* /D -<number of days> /C "cmd /c del @path"
@@ -107,9 +108,10 @@ set regdevmodedir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\A
 set regdevmodekey=AllowDevelopmentWithoutDevLicense
 set "regimfeodir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options"
 set "npadexe=notepad.exe"
-set nppdir="C:\Program Files\Notepad++"
+set "nppdir=C:\Program^ Files\Notepad++"
 set "nppexe=notepad++.exe"
-
+set "xmingdir=C:\Program^ Files (x86)\Xming"
+set xmingexe=Xming.exe
 
 set psldir=%SystemRoot%
 set pslexe=powershell.exe
@@ -129,11 +131,12 @@ set cppldir=%exe2dir%\%plexe%
 set tpbldir=%tpdir%\%blexe%
 set tppldir=%tpdir%\%plexe%
 set exe2dir=%userdocdir%\winreinstall\EXE2
-
 REM set rw10scriptdir="/mnt/c/Users/user/Documents/winreinstall/script/reinstallw10.bat"
 set rw10scriptdir="/mnt/c/Users/user/Documents/GitHub/reinstallw10/reinstallw10.bat"
 set mb1ms="/mnt/d/notes/Documentsv2/1mstart2"
 set mb3gs="/mnt/d/notes/3gsnit"
+set "mbios1ms=D:\notes\Documentsv2\1mstart2"
+set "mbios3gs=D:\notes\3gsnit"
 goto:EOF
 :selfelevateasadmin
 runas /user:administrator /savecred "%DIR0%"
@@ -454,12 +457,16 @@ goto:EOF
 :logintodiscord
 
 
-
-
 :startworking
 REM npp.chrome,w10dir
 REm if mbiosloadedopen
-call :checkapprunningnrun %nppdir% %nppexe%
+REM call :checkapprunningnrun "%nppdir%" "%nppexe%"
+REM call :checkapprunningnrun "%xmingdir%" "%xmingexe%"
+if exist %mbios1ms% (
+if exist %mbios3gs% (
+call :wslgeditmbboth
+)
+)
 goto:choosenow
 ::RUNWMMT5
 :runwmmt5
@@ -478,6 +485,7 @@ goto:choosenow
 call :checkapprunningnrun %egldir% %eglexe%
 goto:choosenow
 :setdefaultapps
+REM https://social.technet.microsoft.com/Forums/ie/en-US/06d35f90-56cb-4dec-b326-bd471d06acee/change-default-program-for-file-command-line-or-registry?forum=w7itprogeneral
 REM https://superuser.com/questions/362063/how-to-associate-a-file-with-a-program-in-windows-via-cmd
 REM assoc | more
 onassoc .mkv=MPC-BE.AssocFile.MKV
@@ -486,7 +494,8 @@ ftype TIFImage.Document="C:\Program Files\MSPVIEW.exe" "%1"
 goto:EOF
 :wslgedit
 set filedir1=%1
-wsl export DISPLAY=:0 ; nohup gedit %filedir1% &
+REM wsl export DISPLAY=:0 ; nohup gedit %filedir1% &
+start /b cmd /c "wsl export DISPLAY=:0 ; nohup gedit %filedir1% &"
 goto:EOF
 :wslgeditrw10
 REM https://blogs.msdn.microsoft.com/commandline/2017/11/28/a-guide-to-invoking-wsl/
@@ -496,16 +505,15 @@ REM wsl [command] (NOTE: In this case you don't append '-c', you just type in yo
 REM ubuntu -c export DISPLAY=:0 ; nohup gedit %rw10scriptdir% & disown $!
 call :wslgedit "%rw10scriptdir%"
 goto:EOF
-
 :wslgeditmb1ms
 call :wslgedit "%mb1ms%"
 goto:EOF
 :wslgeditmb3gs
 call :wslgedit "%mb3gs%"
 goto:EOF
-
 :wslgeditmbboth
-wsl export DISPLAY=:0 ; nohup gedit "%mb3gs%" "%mb1ms%" &
+REM wsl export DISPLAY=:0 ; nohup gedit "%mb3gs%" "%mb1ms%" &
+start /b cmd /c "wsl export DISPLAY=:0 ; nohup gedit "%mb3gs%" "%mb1ms%" &"
 goto:EOF
 
 :staticinetcompno
@@ -579,6 +587,7 @@ for /f "tokens=* delims=" %%x in ('findstr /r /i ^
 /c:"^:wslgeditmb1ms" ^
 /c:"^:wslgeditmb3gs" ^
 /c:"^:wslgeditmbboth" ^
+/c:"^:startworking" ^
 /c:"^:testecho" ^
 /c:"^:testlinkd" ^
 /c:"^:testelif" ^
