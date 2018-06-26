@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion enableextensions
 set userid=%USERNAME%
 set userhomedir=%USERPROFILE%
 REM https://superuser.com/questions/131777/windows-7-command-line-variable-equivalent-to-0?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-set scriptdir=%~f0
+set DIR0=%~f0
 set userdowndir=%userhomedir%\Documents
 set userdocdir=%userhomedir%\Documents
 call :setvar
@@ -26,7 +26,9 @@ set nppfile=npp.exe
 set wxhexeditorinstallerlink="https://sourceforge.net/projects/wxhexeditor/files/latest/download"
 set wxhexfile="wxhexeditor.zip"
 
-set nvidiadinstallerlink="http://us.download.nvidia.com/Windows/398.11/398.11-desktop-win10-64bit-international-whql.exe"
+set githubdlink=""
+set atomlink=""
+set "nvidiadinstallerlink=http://us.download.nvidia.com/Windows/398.11/398.11-desktop-win10-64bit-international-whql.exe"
 set nvidiadexe=nvidia397driver.exe
 set teknopinstallerlink="https://teknoparrot.com/download"
 set teknopzip=TeknoParrot.zip
@@ -41,14 +43,18 @@ set eglinstallerlink=""
 set vlcpinstallerlink=""
 set vjoyinstallerlink=""
 set winpythoninstallerlink="https://sourceforge.net/settings/mirror_choices?projectname=winpython&filename=WinPython_3.6/3.6.5.0/WinPython64-3.6.5.0Qt5.exe&selected=jaist"
-set winpythonexe="winpython.exe"
+set winpythonexe=winpython.exe
 set matlabinstallerlink=""
-set matlabexe="matlab.zip"
+set matlabexe=matlab.zip
 REM regkey
 set windefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths
 set regdarkmodedir=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize
 set regdarkmodekey=AppsUseLightTheme
 
+set psldir=%SystemRoot%
+set pslexe=powershell.exe
+set cmddir=%SystemRoot%
+set cmdexe=cmd.exe
 set ucrdir=%userdocdir%\UCR
 set ucrexe=UCR.exe
 set egldir=C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32
@@ -63,6 +69,87 @@ set cppldir=%exe2dir%\%plexe%
 set tpbldir=%tpdir%\%blexe%
 set tppldir=%tpdir%\%plexe%
 set exe2dir=%userdocdir%\winreinstall\EXE2
+goto:EOF
+:testdelimit
+REM https://stackoverflow.com/questions/27443383/how-to-get-first-part-of-a-delimited-string-in-batch
+for /f "tokens=1 delims=." %%a in ("%var%") do set "new_var=%%a"
+set var=something.contains.text
+set new_var=%var:.=&rem %
+
+set "str=Te$ting thi$ $cript for $zero"
+set "result=%str:$=" & set "result=%"
+echo %result%
+
+set windefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths
+set "str=%windefexcdir%"
+set "result=%str:\=" & 
+set "result=%"
+echo %result%
+
+goto:EOF
+
+:testlinkd
+call :getstrlastdlink "%nvidiadinstallerlink%" "/"
+echo %result%
+goto:EOF
+:getstrlastdlink
+REM set windefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths
+REM set "str=%windefexcdir%"
+set "str=%1"
+set "del=%2"
+
+set "result=%str:/=" & set "result=%"
+echo %result%
+goto:EOF
+:testingregkey
+set windefexcdir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths
+set regdarkmodedir=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize
+set regdarkmodekey=AppsUseLightTheme
+set KEY_NAME=%windefexcdir%
+set KEY_NAME=%regdarkmodedir%
+set VALUE_NAME=C:\Users\user\Downloads
+set dir=%VALUE_NAME%
+set keytype=REG_DWORD
+set valto=0x0
+set dmname=dm
+set bladir=%KEY_NAME%\%VALUE_NAME%
+reg add "%KEY_NAME%" /v "%VALUE_NAME%" /t %keytype% /d %valto% /f
+reg delete "%KEY_NAME%" /v "%VALUE_NAME%" /f
+powershell.exe -Command "Add-MpPreference -ExclusionPath '%dir%'"
+powershell.exe -Command "Remove-MpPreference -ExclusionPath '%dir%'"
+powershell -inputformat none -outputformat none -NonInteractive -Command Add-MpPreference -ExclusionPath $ENV:USERPROFILE\Downloads
+goto:EOF
+:elevatecmd
+powershell.exe -Command "Start-Process cmd \"/k cd /d %cd%\" -Verb RunAs"
+goto:EOF
+:checkapprunningnrun
+REM https://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
+set appdir=%1
+set app=%2
+tasklist /FI "IMAGENAME eq %app%" 2>NUL | find /I /N "%app%">NUL
+if %ERRORLEVEL% equ 0 (
+echo Program is running
+) else ( 
+cd /d "%appdir%"
+start "" "%app%"
+)
+goto:EOF
+:opencmd
+call :checkapprunningnrun %cmddir% %cmdexe% 
+goto:EOF
+:openpsl
+call :checkapprunningnrun %psldir% %pslexe% 
+goto:EOF
+:opendirinexp
+set dir=%1
+%SystemRoot%\explorer.exe "%dir%"
+goto:EOF
+:traprestart
+REM https://stackoverflow.com/questions/3827567/how-to-get-the-path-of-the-batch-script-in-windows
+set mypath=%~dp0
+set PATH0=%mypath:~0,-1%
+echo %PATH0%
+start "" %DIR0%
 goto:EOF
 ::TOOLS
 :wsleditrw10
@@ -98,8 +185,29 @@ netsh firewall add allowedprogram "%1%" >nul
 goto:EOF
 
 :addexctodefender
+set dir=%1
 REM https://blogs.technet.microsoft.com/heyscriptingguy/2016/02/14/powertip-add-exclusion-folder-to-windows-defender-using-powershell/
-powershell.exe -Command "Add-MpPreference -ExclusionPath '%1%'"
+powershell.exe -Command "Add-MpPreference -ExclusionPath '%dir%'"
+REM powershell.exe -Command "Remove-MpPreference -ExclusionPath '%dir%'"
+goto:EOF
+:addexctodefender2
+set dir=%1
+set keytype=REG_SZ
+set keyval=0x0
+call :checkthiskey %windefexcdir% %dir% %keytype% %keyval% dirdef
+echo %dir% added
+call :sleep 600
+goto:EOF
+:testelif
+REM https://stackoverflow.com/questions/11081735/how-to-use-if-else-structure-in-a-batch-file
+set test1result=2
+IF %test1result%==1 (
+   echo Example 2 fails
+) ELSE IF %test1result%==2 (
+   echo Example 2 works correctly
+) ELSE (
+    echo Example 2 fails
+)
 goto:EOF
 :invokewsl
 REM https://blogs.msdn.microsoft.com/commandline/2017/11/28/a-guide-to-invoking-wsl/
@@ -232,24 +340,7 @@ reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
 )
 goto:EOF
 
-:addexctodefender2
-set dir=%1
-set keytype=REG_SZ
-set keyval=0x0
-call :checkthiskey %windefexcdir% %dir% %keytype% %keyval% dirdef
-echo %dir% added
-goto:EOF
-:testelif
-REM https://stackoverflow.com/questions/11081735/how-to-use-if-else-structure-in-a-batch-file
-set test1result=2
-IF %test1result%==1 (
-   echo Example 2 fails
-) ELSE IF %test1result%==2 (
-   echo Example 2 works correctly
-) ELSE (
-    echo Example 2 fails
-)
-goto:choosenow
+
 :newregkey
 REM https://www.lifewire.com/how-to-create-edit-and-use-reg-files-2622817
 Windows Registry Editor Version 5.00
@@ -305,18 +396,7 @@ ubuntu -c "sudo apt-get update"
 
 ::RUNWMMT5
 
-:checkapprunningnrun
-REM https://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
-set appdir=%1
-set app=%2
-tasklist /FI "IMAGENAME eq %app%" 2>NUL | find /I /N "%app%">NUL
-if %ERRORLEVEL% equ 0 (
-echo Program is running
-) else ( 
-cd /d "%appdir%"
-start "" "%app%"
-)
-goto:EOF
+
 :extractzip
 .\7zip.exe %zipdir%
 goto:EOF
@@ -351,7 +431,11 @@ for /f "tokens=* delims=" %%x in ('findstr /r /i ^
 /c:"^:checkthiskey" ^
 /c:"^:enabledarkmode" ^
 /c:"^:testelif" ^
-/c:"^:testbogus" %1') do (
+/c:"^:testbogus" ^
+/c:"^:openpsl" ^
+/c:"^:opendirinexp" ^
+/c:"^:testlinkd" ^
+/c:"^:traprestart" %1') do (
 set allfn[!countfn!]=%%x
 REM echo !countfn!%%x
 call echo !countfn!%%allfn[!countfn!]%%
@@ -368,8 +452,8 @@ if defined var (call :%fnno%) else (call %%allfn[!fnno!]%%)
 REM call %%allfn[!fnno!]%%
 goto:choosenow
 :choosenow
-call :listallfn %scriptdir%
-call :choosefn %scriptdir%
+call :listallfn %DIR0%
+call :choosefn %DIR0%
 EXIT /B %ERRORLEVEL%
 
 :testecho
