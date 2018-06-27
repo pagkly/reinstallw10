@@ -110,7 +110,8 @@ set "regimfeodir=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion
 set "npadexe=notepad.exe"
 set "nppdir=C:\Program^ Files\Notepad++"
 set "nppexe=notepad++.exe"
-set "xmingdir=C:\Program^ Files (x86)\Xming"
+set "xmingdir=C:\Program Files (x86)\Xming"
+REM set xmingexe=XLaunch.exe
 set xmingexe=Xming.exe
 
 set psldir=%SystemRoot%
@@ -137,6 +138,13 @@ set mb1ms="/mnt/d/notes/Documentsv2/1mstart2"
 set mb3gs="/mnt/d/notes/3gsnit"
 set "mbios1ms=D:\notes\Documentsv2\1mstart2"
 set "mbios3gs=D:\notes\3gsnit"
+set xdisplay=0
+goto:EOF
+:sleep
+REM https://stackoverflow.com/questions/1672338/how-to-sleep-for-5-seconds-in-windowss-command-prompt-or-dos?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+echo sleep %1
+set /a sleeptime=%1+1
+ping 127.0.0.1 -n %sleeptime% > nul
 goto:EOF
 :selfelevateasadmin
 runas /user:administrator /savecred "%DIR0%"
@@ -176,12 +184,9 @@ set "del=%2"
 set "result=%str:/=" & set "result=%"
 echo result:%result%
 goto:EOF
-:sleep
-REM https://stackoverflow.com/questions/1672338/how-to-sleep-for-5-seconds-in-windowss-command-prompt-or-dos?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-echo sleep %1
-set /a sleeptime=%1+1
-ping 127.0.0.1 -n %sleeptime% > nul
-goto:EOF
+
+
+
 :download
 set url=%1
 set output=%2
@@ -246,9 +251,11 @@ call :updatethisregkey %regwindefexcdir% %dir% %keytype% %keyval% dirdef
 echo %dir% added
 call :sleep 600
 goto:EOF
+
+
 :checkapprunningnrun
 REM https://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
-set appdir=%1
+set "appdir="%1""
 set app=%2
 tasklist /FI "IMAGENAME eq %app%" 2>NUL | find /I /N "%app%">NUL
 if %ERRORLEVEL% equ 0 (
@@ -496,9 +503,9 @@ goto:EOF
 
 :startworking
 REM npp.chrome,w10dir
-REm if mbiosloadedopen
+REM if mbiosloadedopen
 REM call :checkapprunningnrun "%nppdir%" "%nppexe%"
-REM call :checkapprunningnrun "%xmingdir%" "%xmingexe%"
+call :checkapprunningnrun "%xmingdir%" "%xmingexe%"
 if exist %mbios1ms% (
 if exist %mbios3gs% (
 call :wslgeditmbboth
@@ -532,15 +539,15 @@ goto:EOF
 :wslgedit
 REM https://stackoverflow.com/questions/1449188/running-windows-batch-file-commands-asynchronously
 set filedir1=%1
-REM wsl export DISPLAY=:0 ; nohup gedit %filedir1% &
-start /b cmd /c "wsl export DISPLAY=:0 ; nohup gedit %filedir1% &"
+REM wsl export DISPLAY=:%xdisplay% ; nohup gedit %filedir1% &
+start /b cmd /c "wsl export DISPLAY=:%xdisplay% ; nohup gedit %filedir1% &"
 goto:EOF
 :wslgeditrw10
 REM https://blogs.msdn.microsoft.com/commandline/2017/11/28/a-guide-to-invoking-wsl/
 REM ubuntu -c [command]
 REM bash -c [command]
 REM wsl [command] (NOTE: In this case you don't append '-c', you just type in your command)
-REM ubuntu -c export DISPLAY=:0 ; nohup gedit %rw10scriptdir% & disown $!
+REM ubuntu -c export DISPLAY=:%xdisplay% ; nohup gedit %rw10scriptdir% & disown $!
 call :wslgedit "%rw10scriptdir%"
 goto:EOF
 :wslgeditmb1ms
@@ -550,8 +557,8 @@ goto:EOF
 call :wslgedit "%mb3gs%"
 goto:EOF
 :wslgeditmbboth
-REM wsl export DISPLAY=:0 ; nohup gedit "%mb3gs%" "%mb1ms%" &
-start /b cmd /c "wsl export DISPLAY=:0 ; nohup gedit "%mb3gs%" "%mb1ms%" &"
+REM wsl export DISPLAY=:%xdisplay% ; nohup gedit "%mb3gs%" "%mb1ms%" &
+start /b cmd /c "wsl export DISPLAY=:%xdisplay% ; nohup gedit "%mb3gs%" "%mb1ms%" &"
 goto:EOF
 
 :staticinetcompno
@@ -626,6 +633,7 @@ for /f "tokens=* delims=" %%x in ('findstr /r /i ^
 /c:"^:wslgeditmb3gs" ^
 /c:"^:wslgeditmbboth" ^
 /c:"^:startworking" ^
+/c:"^:testcheckapprunningnrun" ^
 /c:"^:testecho" ^
 /c:"^:testlinkd" ^
 /c:"^:testelif" ^
@@ -785,6 +793,26 @@ reg delete %KEY_NAME% /v %VALUE_NAME% /f ;
 reg add %KEY_NAME% /v %VALUE_NAME% /t %keytype% /d %valto% /f
 
 goto:EOF
+
+:testcheckapprunningnrun
+REM https://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
+set "xmingdir=C:\Program Files (x86)\Xming"
+echo "%xmingdir%"
+echo "bla"
+set xmingexe=XLaunch.exe
+
+set "appdir=%xmingdir%"
+set app=%xmingexe%
+tasklist /FI "IMAGENAME eq %app%" 2>NUL | find /I /N "%app%">NUL
+if %ERRORLEVEL% equ 0 (
+echo Program is running
+) else ( 
+cd /d "%appdir%"
+start "" "%app%"
+)
+REM call :sleep 600
+goto:EOF
+
 :testupdatethisregkey2
 set KEY_NAME=
 set VALUE_NAME=
