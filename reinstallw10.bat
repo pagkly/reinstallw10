@@ -62,7 +62,7 @@ call :setvar
 REM call :selfelevateasadmin
 call :addexctodefender %userdocdir%
 call :addexctodefender %userdowndir%
-call :startworking &
+call :startworking
 call :choosenow
 exit /B %ERRORLEVEL%
 REM forfiles /p "C:\what\ever" /s /m *.* /D -<number of days> /C "cmd /c del @path"
@@ -148,8 +148,8 @@ set "npadexe=notepad.exe"
 set "nppdir=C:\Program^ Files\Notepad++"
 set "nppexe=notepad++.exe"
 set "xmingdir=C:\Program Files (x86)\Xming"
-REM set xmingexe=XLaunch.exe
-set xmingexe=Xming.exe
+set xmingexe=XLaunch.exe
+REM set xmingexe=Xming.exe
 
 set psldir=%SystemRoot%
 set pslexe=powershell.exe
@@ -544,9 +544,10 @@ goto:EOF
 REM npp.chrome,w10dir
 REM if mbiosloadedopen
 REM call :checkapprunningnrun "%nppdir%" "%nppexe%"
-call :checkapprunningnrun "%xmingdir%" "%xmingexe%"
+
 if exist %mbios1ms% (
 if exist %mbios3gs% (
+call :checkapprunningnrun "%xmingdir%" "%xmingexe%"
 call :wslgeditmbboth
 )
 )
@@ -567,23 +568,37 @@ goto:choosenow
 :runeglPC
 call :checkapprunningnrun %egldir% %eglexe%
 goto:choosenow
+:setdefaultappsbyreg
+REM COMMENT
+REM THIS IS AN EXAMPLE. CREATE ABOVE BATCH FILE AND EXECUTE IT.
+REM You will be able to open Python files 
+rem https://stackoverflow.com/questions/35669120/simple-ftype-command-not-working
+reg.exe add "%key%\.py" /f /t REG_SZ /d "Python.File" >NUL 2>NUL
+reg.exe add "%key%\Python.File" /f /t REG_SZ /d "Python File" >NUL 2>NUL
+reg.exe add "%key%\Python.File\DefaultIcon" /f /t REG_SZ /d "%pyhome%DLLs\py.ico" >NUL 2>NUL
+reg.exe add "%key%\Python.File\shell\Edit with IDLE\command" /f /t REG_SZ /d "\"%pyhome%pythonw.exe\" \"%pyhome%Lib\idlelib\idle.pyw\" -e \"%%1\"" >NUL 2>NUL
+reg.exe add "%key%\Python.File\shell\open\command" /f /t REG_SZ /d "\"%pyhome%pywin.bat\" \"%%1\" %%*" >NUL 2>NUL
+reg.exe add "%key%\Python.File\shellex\DropHandler" /f /t REG_SZ /d "{60254CA5-953B-11CF-8C96-00AA00B8708C}" >NUL 2>NUL
+goto:EOF
 :setdefaultapps
 REM https://social.technet.microsoft.com/Forums/ie/en-US/06d35f90-56cb-4dec-b326-bd471d06acee/change-default-program-for-file-command-line-or-registry?forum=w7itprogeneral
 REM https://superuser.com/questions/362063/how-to-associate-a-file-with-a-program-in-windows-via-cmd
 REM https://ss64.com/nt/ftype.html
 REM assoc | more
-set pdfadobe="C:\Users\%username%\Documents\Automate\3Acrobat.Pro.DC\Acrobat DC\Acrobat\Acrobat.exe"
-set pdfsumatra="C:\Users\%username%\Documents\Automate\SumatraPDF-3.1.2\SumatraPDF.exe"
-set editnpp="C:\Users\%username%\Documents\Automate\3Notepad++\notepad++.exe"
 rem %localappdata%
-set editatom="C:\Users\%username%\AppData\Local\atom\atom.exe"
-ftype userpdfeditor1="%pdfadobe%" "%1"
-ftype userpdfeditor2="%pdfsumatra%" "%1"
+rem needadmin
+set "pdfadobe=C:\Users\%username%\Documents\Automate\3Acrobat.Pro.DC\Acrobat DC\Acrobat\Acrobat.exe"
+set "pdfsumatra=C:\Users\%username%\Documents\Automate\SumatraPDF-3.1.2\SumatraPDF.exe"
+set "editnpp=C:\Users\%username%\Documents\Automate\3Notepad++\notepad++.exe"
+set "editatom=C:\Users\%username%\AppData\Local\atom\atom.exe"
+set "editidle3=C:\Users\%username%\Documents\Automate\3WinPython-32bit-3.5.3.1Qt5\IDLEX (Python GUI).exe"
+ftype userpdfeditor1=%pdfadobe% "%1"
+ftype userpdfeditor2=%pdfsumatra% "%1"
 assoc .pdf=userpdfeditor1
-ftype usereditor1="%editnpp%" "%1"
-ftype usereditor2="%editatom%" "%1"
+ftype usereditor1=%editnpp% "%1"
+ftype usereditor2=%editatom% "%1"
 assoc .txt=usereditor1
-
+ftype userpyeditor2=%editidle3% "%1"
 goto:EOF
 :wslgedit
 REM https://stackoverflow.com/questions/1449188/running-windows-batch-file-commands-asynchronously
@@ -649,13 +664,7 @@ goto:choosenow
 
 
 ::FNENGINE
-:traprestart
-REM https://stackoverflow.com/questions/3827567/how-to-get-the-path-of-the-batch-script-in-windows
-set mypath=%~dp0
-set PATH0=%mypath:~0,-1%
-echo %PATH0%
-start "" %DIR0%
-goto:EOF
+
 :listallfn
 REM https://stackoverflow.com/questions/9789563/how-to-write-a-search-pattern-to-include-a-space-in-findstr/42534211?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 REM cd /d %userhomedir%\Downloads\winreinstall\script\
@@ -669,6 +678,7 @@ for /f "tokens=* delims=" %%x in ('findstr /r /i ^
 /c:"^:downloadallapps" ^
 /c:"^:reinstallw10" ^
 /c:"^:reinstallw10g" ^
+/c:"^:setdefaultapps" ^
 /c:"^:run" ^
 /c:"^:updatethisregkey" ^
 /c:"^:enabledarkmode" ^
@@ -694,6 +704,17 @@ call echo !countfn!%%allfn[!countfn!]%%
 set /a countfn+=1
 )
 goto:EOF
+
+:traprestart
+REM https://stackoverflow.com/questions/3827567/how-to-get-the-path-of-the-batch-script-in-windows
+set mypath=%~dp0
+set PATH0=%mypath:~0,-1%
+echo %PATH0%
+start "" %DIR0%
+goto:EOF
+
+
+
 :choosefn
 REM call echo 1%allfn[1]%
 set /p fnno="choosefn: "
@@ -704,8 +725,8 @@ if defined var (call :%fnno%) else (call %%allfn[!fnno!]%%)
 REM call %%allfn[!fnno!]%%
 goto:choosenow
 :choosenow
-call :listallfn %DIR0%
-call :choosefn %DIR0%
+call :listallfn "%DIR0%"
+call :choosefn "%DIR0%"
 EXIT /B %ERRORLEVEL%
 
 
