@@ -592,6 +592,7 @@ rem needadmin
 set "pdfadobe=C:\Users\%username%\Documents\Automate\3Acrobat.Pro.DC\Acrobat DC\Acrobat\Acrobat.exe"
 set "pdfsumatra=C:\Users\%username%\Documents\Automate\SumatraPDF-3.1.2\SumatraPDF.exe"
 set "editnpp=C:\Users\%username%\Documents\Automate\3Notepad++\notepad++.exe"
+set "editwxhex=C:\Users\%username%\Documents\Automate\3wxHexEditor-v0.23-Win32\wxHexEditor\wxHexEditor.exe"
 set "editatom=C:\Users\%username%\AppData\Local\atom\atom.exe"
 set "editidle3=C:\Users\%username%\Documents\Automate\3WinPython-32bit-3.5.3.1Qt5\IDLEX (Python GUI).exe"
 ftype userpdfeditor1=%pdfadobe% "%1"
