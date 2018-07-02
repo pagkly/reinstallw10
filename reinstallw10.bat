@@ -68,6 +68,43 @@ exit /B %ERRORLEVEL%
 REM forfiles /p "C:\what\ever" /s /m *.* /D -<number of days> /C "cmd /c del @path"
 REM https://stackoverflow.com/questions/51054/batch-file-to-delete-files-older-than-n-days?rq=1
 
+:setvar2
+if exist
+if not download
+install
+
+
+set cpbldir=%exe2dir%\%blexe%
+set cppldir=%exe2dir%\%plexe%
+set tpbldir=%tpdir%\%blexe%
+set tppldir=%tpdir%\%plexe%
+set exe2dir=%userdocdir%\winreinstall\EXE2
+
+psl;;%SystemRoot%;;powershell.exe
+cmd;;;;%SystemRoot%;;cmd.exe
+ucr;;;;%userdocdir%\UCR;;UCR.exe
+tpdir;;;%tp151dir%
+tp151;;;;%userdocdir%\TeknoParrot_1.51_Hotfix23;;TeknoParrotUi.exe
+tpblexe;;%exe2dir%;;BudgieLoader.exe
+tpplexe;;%exe2dir%;;ParrotLoader.exe
+egl;;;;C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32;;EpicGamesLauncher.exe
+chrome;;"http://dl.google.com/chrome/install/375.126/chrome_installer.exe";;ChromeSetup.exe
+npp;;https://notepad-plus-plus.org/repository/7.x/7.5.6/npp.7.5.6.Installer.x64.exe";;npp.exe
+wxhexeditor;;"https://sourceforge.net/projects/wxhexeditor/files/latest/download";;wxhexeditor.zip
+
+
+
+rw10;;"/mnt/c/Users/user/Documents/GitHub/reinstallw10/reinstallw10.bat"
+mb1ms;;"/mnt/d/notes/Documentsv2/1mstart2"
+mb3gs;;"/mnt/d/notes/3gsnit"
+"mbios1ms;;D:\notes\Documentsv2\1mstart2"
+"mbios3gs;;D:\notes\3gsnit"
+set xdisplay=0
+D:\
+
+
+set downloaddir=%userdocdir%\winreinstall\EXE
+goto:EOF
 :setvar
 set downloaddir=%userdocdir%\winreinstall\EXE
 set w10actapp=""
@@ -185,7 +222,9 @@ set "result=%str:/=" & set "result=%"
 echo result:%result%
 goto:EOF
 
-
+:installskype
+https://go.skype.com/classic.skype
+goto:EOF
 
 :download
 set url=%1
@@ -531,10 +570,20 @@ goto:choosenow
 :setdefaultapps
 REM https://social.technet.microsoft.com/Forums/ie/en-US/06d35f90-56cb-4dec-b326-bd471d06acee/change-default-program-for-file-command-line-or-registry?forum=w7itprogeneral
 REM https://superuser.com/questions/362063/how-to-associate-a-file-with-a-program-in-windows-via-cmd
+REM https://ss64.com/nt/ftype.html
 REM assoc | more
-onassoc .mkv=MPC-BE.AssocFile.MKV
-ftype MPC-BE.AssocFile.MKV=c:\Program Files\MPC-BE x64\mpc-be64.exe "%1"pause
-ftype TIFImage.Document="C:\Program Files\MSPVIEW.exe" "%1"
+set pdfadobe="C:\Users\%username%\Documents\Automate\3Acrobat.Pro.DC\Acrobat DC\Acrobat\Acrobat.exe"
+set pdfsumatra="C:\Users\%username%\Documents\Automate\SumatraPDF-3.1.2\SumatraPDF.exe"
+set editnpp="C:\Users\%username%\Documents\Automate\3Notepad++\notepad++.exe"
+rem %localappdata%
+set editatom="C:\Users\%username%\AppData\Local\atom\atom.exe"
+ftype userpdfeditor1="%pdfadobe%" "%1"
+ftype userpdfeditor2="%pdfsumatra%" "%1"
+assoc .pdf=userpdfeditor1
+ftype usereditor1="%editnpp%" "%1"
+ftype usereditor2="%editatom%" "%1"
+assoc .txt=usereditor1
+
 goto:EOF
 :wslgedit
 REM https://stackoverflow.com/questions/1449188/running-windows-batch-file-commands-asynchronously
