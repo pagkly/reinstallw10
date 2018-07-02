@@ -295,7 +295,9 @@ goto:EOF
 :checkapprunningnrun
 REM https://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
 set "appdir="%1""
-set app=%2
+set "app=%2"
+echo %appdir%
+REM call :sleep 500
 tasklist /FI "IMAGENAME eq %app%" 2>NUL | find /I /N "%app%">NUL
 if %ERRORLEVEL% equ 0 (
 echo Program is running
@@ -557,10 +559,10 @@ goto:choosenow
 REM correctbudgiloader
 REM if not exist %tpbldir% ( cp exe2dir )
 REM if not exist %tppldir% ()
-call :addexctodefender2 %userdocdir%
-call :addexctodefender2 %exe2dir%
-call :addexctodefender2 %tpbldir%
-call :addexctodefender2 %tppldir%
+REM call :addexctodefender2 %userdocdir%
+REM call :addexctodefender2 %exe2dir%
+REM call :addexctodefender2 %tpbldir%
+REM call :addexctodefender2 %tppldir%
 call :checkapprunningnrun %ucrdir% %ucrexe%
 call :checkapprunningnrun %tpdir% %tpexe% 
 goto:choosenow
