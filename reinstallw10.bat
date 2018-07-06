@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 REM https://stackoverflow.com/questions/7044985/how-can-i-auto-elevate-my-batch-file-so-that-it-requests-from-uac-administrator
 REM selfelevated
  CLS
@@ -378,6 +378,28 @@ goto:EOF
 :installoffice16
 goto:EOF
 ::REINSTALL
+:downloadmicrosofttk
+
+REM https://www.reddit.com/r/MSToolkit/comments/8hf4tc/microsoft_toolkit_v264_download/
+
+REM MEGA: https://mega.nz/#F!Ir5S1bSD!y7zqy6BdG14J_Kq8mLmzKA
+
+REM Google Drive: https://drive.google.com/drive/folders/1ky-AX_B1CqB8zHC3l4ldpPjDLIoCDccx
+
+REM OneDrive: https://1drv.ms/f/s!Agk9fHaAotuehTB1oQaGkq_kb1Rk
+REM Box: https://app.box.com/s/xdzsk9lm1uyrzikvrzabs5xk5hijd8x7
+
+REM Dropbox: https://www.dropbox.com/sh/5o2zaw63f2jhbn2/AAC2Cv1nnTZbNDy50YqOF6ria?dl=0
+
+utorrent.exe magnet:?xt=urn:btih:1FB324E0158C8D23FF42922C92731CE1A8D08BF0
+
+:installmicrosofttk
+
+start "" "MTK.exe"
+
+:downloadfiinotewine
+
+:installfiinotewine
 :rw10common
 call :enableportablemode
 call :enabledevmode
