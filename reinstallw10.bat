@@ -1,6 +1,15 @@
-﻿@echo off
-REM https://stackoverflow.com/questions/7044985/how-can-i-auto-elevate-my-batch-file-so-that-it-requests-from-uac-administrator
+﻿REM https://stackoverflow.com/questions/7044985/how-can-i-auto-elevate-my-batch-file-so-that-it-requests-from-uac-administrator
 REM selfelevated
+@echo off
+setlocal enabledelayedexpansion enableextensions
+cd \ && cd windows\system32
+set userid=%USERNAME%
+set userhomedir=%USERPROFILE%
+REM https://superuser.com/questions/131777/windows-7-command-line-variable-equivalent-to-0?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+set DIR0=%~f0
+set userdowndir=%userhomedir%\Downloads
+set userdocdir=%userhomedir%\Documents
+
  CLS
  ECHO.
  ECHO =============================
@@ -50,14 +59,6 @@ REM selfelevated
  setlocal & cd /d %~dp0
  if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
 
-cd \ && cd windows\system32
-setlocal enabledelayedexpansion enableextensions
-set userid=%USERNAME%
-set userhomedir=%USERPROFILE%
-REM https://superuser.com/questions/131777/windows-7-command-line-variable-equivalent-to-0?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-set DIR0=%~f0
-set userdowndir=%userhomedir%\Downloads
-set userdocdir=%userhomedir%\Documents
 call :setvar
 REM call :selfelevateasadmin
 call :addexctodefender %userdocdir%
@@ -69,44 +70,37 @@ REM forfiles /p "C:\what\ever" /s /m *.* /D -<number of days> /C "cmd /c del @pa
 REM https://stackoverflow.com/questions/51054/batch-file-to-delete-files-older-than-n-days?rq=1
 
 :setvar2
-if exist
-if not download
-install
-
-
+REM if exist
+REM if not download
+REM install
 set cpbldir=%exe2dir%\%blexe%
 set cppldir=%exe2dir%\%plexe%
 set tpbldir=%tpdir%\%blexe%
 set tppldir=%tpdir%\%plexe%
 set exe2dir=%userdocdir%\winreinstall\EXE2
+REM psl;;%SystemRoot%;;powershell.exe
+REM cmd;;;;%SystemRoot%;;cmd.exe
+REM ucr;;;;%userdocdir%\UCR;;UCR.exe
+REM tpdir;;;%tp151dir%
+REM tp151;;;;%userdocdir%\TeknoParrot_1.51_Hotfix23;;TeknoParrotUi.exe
+REM tpblexe;;%exe2dir%;;BudgieLoader.exe
+REM tpplexe;;%exe2dir%;;ParrotLoader.exe
+REM egl;;;;C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32;;EpicGamesLauncher.exe
+REM chrome;;"http://dl.google.com/chrome/install/375.126/chrome_installer.exe";;ChromeSetup.exe
+REM npp;;https://notepad-plus-plus.org/repository/7.x/7.5.6/npp.7.5.6.Installer.x64.exe";;npp.exe
+REM wxhexeditor;;"https://sourceforge.net/projects/wxhexeditor/files/latest/download";;wxhexeditor.zip
 
-psl;;%SystemRoot%;;powershell.exe
-cmd;;;;%SystemRoot%;;cmd.exe
-ucr;;;;%userdocdir%\UCR;;UCR.exe
-tpdir;;;%tp151dir%
-tp151;;;;%userdocdir%\TeknoParrot_1.51_Hotfix23;;TeknoParrotUi.exe
-tpblexe;;%exe2dir%;;BudgieLoader.exe
-tpplexe;;%exe2dir%;;ParrotLoader.exe
-egl;;;;C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32;;EpicGamesLauncher.exe
-chrome;;"http://dl.google.com/chrome/install/375.126/chrome_installer.exe";;ChromeSetup.exe
-npp;;https://notepad-plus-plus.org/repository/7.x/7.5.6/npp.7.5.6.Installer.x64.exe";;npp.exe
-wxhexeditor;;"https://sourceforge.net/projects/wxhexeditor/files/latest/download";;wxhexeditor.zip
-
-
-
-rw10;;"/mnt/c/Users/user/Documents/GitHub/reinstallw10/reinstallw10.bat"
-mb1ms;;"/mnt/d/notes/Documentsv2/1mstart2"
-mb3gs;;"/mnt/d/notes/3gsnit"
-"mbios1ms;;D:\notes\Documentsv2\1mstart2"
-"mbios3gs;;D:\notes\3gsnit"
+REM rw10;;"/mnt/c/Users/user/Documents/GitHub/reinstallw10/reinstallw10.bat"
+REM mb1ms;;"/mnt/d/notes/Documentsv2/1mstart2"
+REM mb3gs;;"/mnt/d/notes/3gsnit"
+REM "mbios1ms;;D:\notes\Documentsv2\1mstart2"
+REM  "mbios3gs;;D:\notes\3gsnit"
 set xdisplay=0
-D:\
-
-
+REM D:\
 set downloaddir=%userdocdir%\winreinstall\EXE
 goto:EOF
 :setvar
-set downloaddir=%userdocdir%\winreinstall\EXE
+set "downloaddir=%userdocdir%\winreinstall\EXE"
 set w10actapp=""
 set chromeinstallerlink="http://dl.google.com/chrome/install/375.126/chrome_installer.exe"
 REM set chromeinstallerlink="https://www.google.com/chrome/thankyou.html?statcb=1^&installdataindex=defaultbrowser"
@@ -148,7 +142,9 @@ set "npadexe=notepad.exe"
 set "nppdir=C:\Program^ Files\Notepad++"
 set "nppexe=notepad++.exe"
 set "xmingdir=C:\Program Files (x86)\Xming"
+set "xmingdir2=C:\Program Files\VcXsrv"
 set xmingexe=XLaunch.exe
+set xmingexe2=xlaunch.exe
 REM set xmingexe=Xming.exe
 
 set psldir=%SystemRoot%
@@ -571,7 +567,12 @@ REM call :checkapprunningnrun "%nppdir%" "%nppexe%"
 
 if exist %mbios1ms% (
 if exist %mbios3gs% (
+if exist "%xmingdir%" (
 call :checkapprunningnrun "%xmingdir%" "%xmingexe%"
+)
+if exist "%xmingdir2%" (
+call :checkapprunningnrun "%xmingdir2%" "%xmingexe2%"
+)
 call :wslgeditmbboth
 )
 )
