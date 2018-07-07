@@ -371,40 +371,39 @@ set VALUE_NAME=%2
 reg delete %KEY_NAME% /v %VALUE_NAME% /f
 goto:EOF
 
+
+::REINSTALL
+:setdownvar
+REM https://superuser.com/questions/191224/populating-array-in-dos-batch-script
+REM https://www.youtube.com/watch?v=ux9vb18eoAE
+FOR %f IN (*.txt) DO ECHO %f
+goto:EOF
 :installoffice16
 goto:EOF
-::REINSTALL
 :downloadmicrosofttk
-
 REM https://www.reddit.com/r/MSToolkit/comments/8hf4tc/microsoft_toolkit_v264_download/
-
 REM MEGA: https://mega.nz/#F!Ir5S1bSD!y7zqy6BdG14J_Kq8mLmzKA
-
 REM Google Drive: https://drive.google.com/drive/folders/1ky-AX_B1CqB8zHC3l4ldpPjDLIoCDccx
-
 REM OneDrive: https://1drv.ms/f/s!Agk9fHaAotuehTB1oQaGkq_kb1Rk
 REM Box: https://app.box.com/s/xdzsk9lm1uyrzikvrzabs5xk5hijd8x7
-
 REM Dropbox: https://www.dropbox.com/sh/5o2zaw63f2jhbn2/AAC2Cv1nnTZbNDy50YqOF6ria?dl=0
-
 utorrent.exe magnet:?xt=urn:btih:1FB324E0158C8D23FF42922C92731CE1A8D08BF0
-
 :installmicrosofttk
-
 start "" "MTK.exe"
-
 :downloadfiinotewine
-
 :installfiinotewine
+:disablehibernate
+powercfg -hibernate off
+goto:EOF
 :rw10common
-call :enableportablemode
+call :disablehibernate
 call :enabledevmode
 call :enabledarkmode
-call :exclusionwindef
-call :disablefirewall
 call :disablehyperv
 call :disablecortana
 call :wincleanup
+call :exclusionwindef
+call :disablefirewall
 
 call :downloadallapps
 call :installchrome
@@ -427,6 +426,7 @@ goto:EOF
 REM https://answers.microsoft.com/en-us/windows/forum/windows_10-update-winpc/you-cant-install-windows-on-a-usb-flash-drive/003a982e-aa32-49ad-8bf5-e7e83d488c63
 REM call :updateregkey "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlset\Control" "1"
 call :rw10common
+call :enableportablemode
 call :installwslgedit
 call :installmatlab
 call :installdockerce
