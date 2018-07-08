@@ -577,6 +577,31 @@ call :wslgeditmbboth
 )
 )
 goto:choosenow
+:disableethernetconnection
+:installwinisohdd
+:installwindowsefi
+REM https://prodesigntools.com/adobe-cc-2018-direct-download-links.html
+REM C:\Program Files (x86)\Common Files\Adobe\OOBE\PDApp\IPC\AdobeIPCBroker.exe
+REM C:\Program Files (x86)\Adobe\Adobe Creative Cloud\CCXProcess\CCXProcess.exe
+REM C:\Program Files (x86)\Common Files\Adobe\Adobe Desktop Common\ADS\Adobe Desktop Service.exe
+
+REM C:\Program Files (x86)\Common Files\Adobe\OOBE\PDApp\core\PDapp.exe
+REM ADobe Licensing Utility
+
+REM PremierePRO
+REM C:\Program Files\Adobe\Adobe Premiere Pro CC 2018\32\dynamiclink.exe
+
+:installadobephotoshopcc
+REm AdobePhotoshop19-mul_x64.zip
+REM https://prodesigntools.com/prdl-download/Photoshop/66A1D1E00DE44601B041A631261EC584/1507846032938/AdobePhotoshop19-mul_x64.zip
+:installadobepremiereprocc
+REM AdobePremierePro12AllTrial.zip
+REm https://prodesigntools.com/prdl-download/Premiere%20Pro/50AAFADD563D4691896967A6AB1D47F8/1507826592638/AdobePremierePro12AllTrial.zip
+:installadobeaftereffectscc
+REM AdobeAfterEffects15AllTrial.zip
+REM https://prodesigntools.com/prdl-download/After%20Effects/FDF6C521034E467BB283B5837FA042FF/1509090722739/AdobeAfterEffects15AllTrial.zip
+:installadobesnrpatcher
+
 ::RUNWMMT5
 :runwmmt5
 REM correctbudgiloader
