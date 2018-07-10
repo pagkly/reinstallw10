@@ -602,6 +602,59 @@ REM AdobeAfterEffects15AllTrial.zip
 REM https://prodesigntools.com/prdl-download/After%20Effects/FDF6C521034E467BB283B5837FA042FF/1509090722739/AdobeAfterEffects15AllTrial.zip
 :installadobesnrpatcher
 
+set "vboxvmdefdir=%USERPROFILE%\VirtualBox VMs"
+set "vboxvmuserdir=%USERPROFILE%\Documents\Docs"
+set "fnnotesdefdir=%USERPROFILE%\AppData\Roaming\FiiNote"
+set "fnnotesuserdir=%USERPROFILE%\Documents\Docs\FiiNote"
+
+set "ph3downlink=https://files.pythonhosted.org/packages/00/36/c08af743a671d94da7fe10ac2d078624f3efc09273ffae7b18601a8414fe/PyHook3-1.6.1-cp35-win32.whl"
+set "ph3fn=pyhook-1.6.1-cp35-cp35m-win32.whl"
+set "ph3downdirfn=%USERPROFILE%\Downloads\%ph3fn%"
+set "winpythonsenvdir=%winpythonsdir%\env.bat"
+set "winpythondir=%USERPROFILE%\Documents\Docs\Automate\3WinPython-32bit-3.5.3.1Qt5"
+set "winpythonsdir=%winpythondir%\scripts"
+
+set "winpythonspdir=%winpythondir%\python-3.5.3\Lib\site-packages"
+set "winpythonw32dir=%winpythonspdir%\win32"
+set "winpythonpw32dir=%winpythonspdir%\pywin32_system32"
+set "pcomdll=pythoncom35.dll"
+set "pwtdll=pywintypes35.dll"
+
+:linkvboxandos
+if not exist "%vboxvmdefdir%" (
+mkdir "%vboxvmdefdir%"
+)
+REM mklink /d notexists exists 
+REM mklink [options] <Link> <Target>
+REM Target is the file/folder that exists, and Link is the created one that links to the target.
+mklink /d "%vboxvmdefdir%\ANDOS" "%vboxvmuserdir%\ANDOS"
+goto:EOF
+:linkfn
+if exist "%fnnotesdefdir%" (
+ren "%fnnotesdefdir%" "FiiNotebk"
+)
+mklink /d "%fnnotesdefdir%" "%fnnotesuserdir%"
+goto:EOF
+:installpyhook3
+REM https://stackoverflow.com/questions/7238403/import-win32api-error-in-python-2-6
+REM PyHook3-1.6.1-cp35-win32.whl
+call :download "%ph3downlink%" "%ph3downdirfn%"
+copy "%ph3downdirfn%" "%winpythondir%\%ph3fn%"
+call "%winpythonsenvdir%"
+pip install wmi win32gui win32api opencv-python
+if not exist "%winpythonpw32dir%\%pcomdll%" (
+copy "%winpythonpw32dir%\%pcomdll%" "%winpythonw32dir%\%pcomdll%"
+)
+if not exist "%winpythonpw32dir%\%pwtdll%" (
+copy "%winpythonpw32dir%\%pwtdll%" "%winpythonw32dir%\%pwtdll%"
+)
+pip install "%ph3downdirfn%"
+goto:EOF
+:pipupgrade
+call "%winpythonsdir%\upgrade_pip.bat"
+goto:EOF
+:changekeyboardtous
+goto:EOF
 ::RUNWMMT5
 :runwmmt5
 REM correctbudgiloader
@@ -727,6 +780,7 @@ for /f "tokens=* delims=" %%x in ('findstr /r /i ^
 /c:"^:openpsl" ^
 /c:"^:opendirinexp" ^
 /c:"^:downloadallapps" ^
+/c:"^:installpyhook3" ^
 /c:"^:reinstallw10" ^
 /c:"^:reinstallw10g" ^
 /c:"^:setdefaultapps" ^
