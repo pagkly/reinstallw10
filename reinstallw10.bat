@@ -1,4 +1,4 @@
-﻿REM https://stackoverflow.com/questions/7044985/how-can-i-auto-elevate-my-batch-file-so-that-it-requests-from-uac-administrator
+﻿REM https://stackoverflow.com/questions/7044985/how-can-i-auto-elevate-my-batch-file-so-that-it-requests-from-uac-administrator
 REM selfelevated
 @echo off
 setlocal enabledelayedexpansion enableextensions
@@ -482,6 +482,23 @@ REM "March of Emipres:War of Lords"
 goto:EOF
 
 ::installallapps
+:installpython3
+REM https://docs.python.org/3/using/windows.html
+REM https://www.howtogeek.com/197947/how-to-install-python-on-windows/
+REM https://stackoverflow.com/questions/573817/where-are-environment-variables-stored-in-registry
+REM HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment
+set PATH0=%LOCALAPPDATA%\Programs\Python\Python37;%LOCALAPPDATA%\Programs\Python\Python37\Scripts;%PATH%
+set PATH=%USERPROFILE%\Downloads\swigwin-3.0.12;%PATH%
+set PYTHONPATH=%LOCALAPPDATA%\Programs\Python\Python37\Scripts
+set swigpath=%USERPROFILE%\Downloads\swigwin-3.0.12
+REM call :download "" ""
+set "envpathdir=HKEY_CURRENT_USER\Environment"
+set "envpathkey=Path"
+set "keytype=REG_EXPAND_SZ"
+set "valto=%LOCALAPPDATA%\Programs\Python\Python37\;%LOCALAPPDATA%\Programs\Python\Python37\Scripts"
+set "dmname="
+call :updatethisregkey %envpathdir% %envpathkey% %keytype% %valto% %dmname% 
+goto:EOF
 :installchrome
 REM https://superuser.com/questions/337210/how-can-i-silently-install-google-chrome?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 REM https://www.youtube.com/watch?v=gl4R1CaSpDU
