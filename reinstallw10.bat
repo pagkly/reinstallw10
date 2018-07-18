@@ -482,7 +482,24 @@ REM "March of Emipres:War of Lords"
 goto:EOF
 
 ::installallapps
+:installw10
+REM mkdir C:\w10pro
+REM set "isofile="
+REM set "wim0file=D:\Users\user\Documents\win10iso\sources\install.wim"
+REM set "wimfile=D:\Users\user\Documents\win10iso\sources\installw10pro.wim"
+REM powershell -Command Mount-DiskImage -ImagePath %isofile%
+
+REM set "wimfile=%USERPROFILE%\Documents\installw10pro.wim"
+REM dism /Get-WimInfo /WimFile:%wim0file%
+REM dism /export-image /SourceImageFile:%wim0file% /SourceIndex:6 /DestinationImageFile:%wimfile%  /Compress:max /CheckIntegrity
+REM dism /Mount-Image /ImageFile:%wimfile% /index:1 /MountDir:C:\w10pro
+REM dism /Unmount-Image /MountDir:C:\w10pro /commit
+
+
 :installpython3
+REM reg copy "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control" "HKEY_LOCAL_MACHINE\WTGS\CurrentControlSet\Control" /s
+REM reg copy "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet" "HKEY_LOCAL_MACHINE\WTGS\CurrentControlSet" /s
+REM reg copy "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager" "HKEY_LOCAL_MACHINE\WTGS\CurrentControlSet\Control\Session Manager" /sreg copy "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager" "HKEY_LOCAL_MACHINE\WTGS\CurrentControlSet\Control\Session Manager" /s
 REM https://docs.python.org/3/using/windows.html
 REM https://www.howtogeek.com/197947/how-to-install-python-on-windows/
 REM https://stackoverflow.com/questions/573817/where-are-environment-variables-stored-in-registry
