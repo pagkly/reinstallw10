@@ -487,11 +487,19 @@ REM https://docs.python.org/3/using/windows.html
 REM https://www.howtogeek.com/197947/how-to-install-python-on-windows/
 REM https://stackoverflow.com/questions/573817/where-are-environment-variables-stored-in-registry
 REM HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment
+set swigpath=%USERPROFILE%\Downloads\swigwin-3.0.12
 set PATH0=%LOCALAPPDATA%\Programs\Python\Python37;%LOCALAPPDATA%\Programs\Python\Python37\Scripts;%PATH%
 set PATH=%USERPROFILE%\Downloads\swigwin-3.0.12;%PATH%
-set PYTHONPATH=%LOCALAPPDATA%\Programs\Python\Python37\Scripts
-set swigpath=%USERPROFILE%\Downloads\swigwin-3.0.12
+set PYTHONHOME=%LOCALAPPDATA%\Programs\Python\Python35
+set PYTHONPATH=%PYTHONHOME%\Lib;%PYTHONHOME%\Scripts
+
+setx PYTHONHOME %LOCALAPPDATA%\Programs\Python\Python35
+setx PYTHONPATH %PYTHONHOME%\Lib;%PYTHONHOME%\Scripts
+
+REM reg add HKEY_CURRENT_USER\Environment /v PYTHONHOME /t REG_EXPAND_SZ /d %LOCALAPPDATA%\Programs\Python\Python35 /f
+REM reg add HKEY_CURRENT_USER\Environment /v PYTHONPATH /t REG_EXPAND_SZ /d %PYTHONHOME%\Lib;%PYTHONHOME%\Scripts /f
 REM call :download "" ""
+set "keycommand=HKEY_CURRENT_USER\Environment Path REG_EXPAND_SZ %LOCALAPPDATA%\Programs\Python\Python37\;%LOCALAPPDATA%\Programs\Python\Python37\Scripts"
 set "envpathdir=HKEY_CURRENT_USER\Environment"
 set "envpathkey=Path"
 set "keytype=REG_EXPAND_SZ"
@@ -527,12 +535,16 @@ goto:EOF
 
 ::regedit
 REM http://www.thewindowsclub.com/fix-cant-install-windows-usb-flash-drive-setup-upgrading-windows-8-1.
+:completeregedit
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0x0 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /v AllowDevelopmentWithoutDevLicense /t REG_DWORD /d 1 /f
+goto:EOF
 :enabledarkmode
 set keytype=REG_DWORD
 set "valto=0x0"
 set dmname=dm
 reg query %regdarkmodedir% /v %regdarkmodekey%
-call :updatethisregkey %regdarkmodedir% %regdarkmodekey% %keytype% %valto% %dmname% 
+REM call :updatethisregkey %regdarkmodedir% %regdarkmodekey% %keytype% %valto% %dmname%
 goto:choosenow
 :enabledevmode
 powershell New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -PropertyType DWORD -Value 1 -Force
