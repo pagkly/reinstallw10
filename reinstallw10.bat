@@ -473,8 +473,8 @@ echo y | wmic product where name="%1" call uninstall.
 
 powershell.exe Get-AppxPackage *CandyCrush* | Remove-AppxPackage &&
 powershell.exe Get-AppxPackage *DisneyMagicKingdoms* | Remove-AppxPackage &&
-powershell.exe Get-AppxPackage *MarchofEmpires* | Remove-AppxPackage &&
-powershell.exe Get-AppxPackage *BubbleWitch* | Remove-AppxPackage &&
+powershell.exe "Get-AppxPackage *MarchofEmpires* | Remove-AppxPackage" &&
+powershell.exe "Get-AppxPackage *BubbleWitch* | Remove-AppxPackage" &&
 REM "Bubble Witch 3 Saga"
 REM "Candy Crush Soda Saga"
 REM "Disney Magic Kingdoms"
@@ -555,6 +555,21 @@ REM http://www.thewindowsclub.com/fix-cant-install-windows-usb-flash-drive-setup
 :completeregedit
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0x0 /f
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /v AllowDevelopmentWithoutDevLicense /t REG_DWORD /d 1 /f
+REM https://www.countercept.com/our-thinking/hunting-for-windows-subsystem-for-linux/
+dism /online /Get-FeatureInfo /FeatureName:Microsoft-Windows-Subsystem-Linux
+dism /online /Enable-Feature /FeatureName:Microsoft-Windows-Subsystem-Linux
+lxrun /install /y
+REM https://www.windowscentral.com/how-launch-bash-shell-right-click-context-menu-windows-10
+REM https://winaero.com/blog/make-open-linux-shell-always-visible/
+reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\bash" /t REG_SZ /d "Open Linux Bash" /f
+reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\bash\command" /t REG_SZ /d "C:\Windows\System32\bash.exe" /f
+REM https://www.ghacks.net/2015/10/25/how-to-disable-windows-defender-in-windows-10-permanently/
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v DisableRealtimeMonitoring /t REG_DWORD /d 1 /f
+pip install --upgrade setuptools
+pip install psutil pymouse pyautogui pillow pyscreenshot numpy scipy matplotlib opencv-python pypiwin32
+pip install pyhook3
+
 goto:EOF
 :enabledarkmode
 set keytype=REG_DWORD
