@@ -512,6 +512,8 @@ set PYTHONPATH=%PYTHONHOME%\Lib;%PYTHONHOME%\Scripts
 
 setx PYTHONHOME %LOCALAPPDATA%\Programs\Python\Python35
 setx PYTHONPATH %PYTHONHOME%\Lib;%PYTHONHOME%\Scripts
+REM reg add "HKEY_CURRENT_USER\Environment" /v Path /t REG_SZ /d "%USERPROFILE%\Downloads\swigwin-3.0.12;%PATH%" /f
+REM C:\Users\user\AppData\Local\Programs\Python\Python35\Scripts\;C:\Users\user\AppData\Local\Programs\Python\Python35\;C:\Users\user\AppData\Local\Microsoft\WindowsApps;C:\Users\user\AppData\Local\GitHubDesktop\bin
 
 REM reg add HKEY_CURRENT_USER\Environment /v PYTHONHOME /t REG_EXPAND_SZ /d %LOCALAPPDATA%\Programs\Python\Python35 /f
 REM reg add HKEY_CURRENT_USER\Environment /v PYTHONPATH /t REG_EXPAND_SZ /d %PYTHONHOME%\Lib;%PYTHONHOME%\Scripts /f
@@ -553,6 +555,9 @@ goto:EOF
 ::regedit
 REM http://www.thewindowsclub.com/fix-cant-install-windows-usb-flash-drive-setup-upgrading-windows-8-1.
 :completeregedit
+REM reg add "HKEY_CURRENT_USER\Environment" /v Path /t REG_SZ /d "%USERPROFILE%\Downloads\swigwin-3.0.12;%PATH%" /f
+REM reg add "HKEY_CURRENT_USER\Environment" /v PYTHONHOME /t REG_SZ /d %LOCALAPPDATA%\Programs\Python\Python35 /f
+REM reg add "HKEY_CURRENT_USER\Environment" /v PYTHONPATH /t REG_EXPAND_SZ /d %LOCALAPPDATA%\Programs\Python\Python35\Lib;%LOCALAPPDATA%\Programs\Python\Python35\Scripts /f
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0x0 /f
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /v AllowDevelopmentWithoutDevLicense /t REG_DWORD /d 1 /f
 REM https://www.countercept.com/our-thinking/hunting-for-windows-subsystem-for-linux/
