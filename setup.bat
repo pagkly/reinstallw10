@@ -2,6 +2,11 @@
 REM https://smallbusiness.chron.com/putting-wim-usb-78160.html
 REM https://4sysops.com/archives/windows-to-go-some-tips-and-an-odd-boot-problem-error-code-0xc000000e/
 REM https://pureinfotech.com/repair-master-boot-record-mbr-windows-10/
+REM https://www.wintips.org/how-to-extract-an-install-wim-file-that-contains-several-install-wim-files/
+REM https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-8.1-and-8/hh824814(v=win.10)
+REM https://www.peppercrew.nl/index.php/2015/02/automated-usb-wim-deployment/
+REM download iso
+REM extract only winpro
 diskpart 
 diskpart list disk
 diskpart select disk 1
