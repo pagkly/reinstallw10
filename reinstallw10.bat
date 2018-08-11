@@ -805,16 +805,16 @@ goto:EOF
 REM https://stackoverflow.com/questions/12535419/setting-a-global-powershell-variable-from-a-function-where-the-global-variable-n?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 REM runas /user:Administrator
 REM ipconfig /all
-cd \ && cd windows\system32
+REM cd \ && cd windows\system32
 netsh interface ip set address name="Ethernet 5" static 192.168.1.%1 255.255.255.0 192.168.1.254
 netsh interface ip set dns name="Ethernet 5" static 192.168.1.83
 netsh interface ip add dns name="Ethernet 5" 8.8.8.8 index=2
 goto:EOF
-:setinternet2
+:staticinetcompnodsinet
 REM https://stackoverflow.com/questions/12535419/setting-a-global-powershell-variable-from-a-function-where-the-global-variable-n?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 REM runas /user:Administrator
 REM ipconfig /all
-cd \ && cd windows\system32
+REM cd \ && cd windows\system32
 netsh interface ip set address name="Ethernet 5" static 192.168.1.68/24 255.255.255.0 192.168.1.1
 netsh interface ip set dns name="Ethernet 5" static 114.114.114.114
 netsh interface ip add dns name="Ethernet 5" 8.8.8.8 index=2
