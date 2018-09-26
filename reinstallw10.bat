@@ -1,4 +1,5 @@
-﻿REM https://www.cnet.com/forums/discussions/how-to-delete-a-program-that-won-t-uninstall-264878/
+﻿REM bcdboot d:\windows /s d: /f BIOS
+REM https://www.cnet.com/forums/discussions/how-to-delete-a-program-that-won-t-uninstall-264878/
 REM Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
 REM CNXT_AUDIO_HDA; CxAudMsg; DTSConfig; Flow; HP-NB-AIO; MicTray; SFPreset; SSPConfig (DTSCONFIG; Install; SA3; Waves\\MaxxAudio)
 REM delete C:\Windows\Program Files\CONEXANT C:\Windows\Program Files\Waves C:\Windows\CxSvc \CxAudioSvc,CxMonSvc,CxUtilSvc C:\Windows\System32\CxAudMsg64
