@@ -14,6 +14,19 @@ REM Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WavesSysSvc
 REM Services: Waves Audio Ltd.: Waves System Service ;; Conexant Systems, Inc, : Conexant Audio Message Service CxAudioSvc CxMonSvc CxUtilSvc
 REM https://arstechnica.com/civis/viewtopic.php?t=1298749
 REM bcdedit /set pciexpress forcedisable
+goto:startthis
+remove REALTEKHD
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVBg
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVBg_MAXX6
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVBg_PushButton
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVCpl
+"C:\Program Files\Realtek\Audio\HDA\RAVBg64.exe" /MAXX4
+"C:\Program Files\Realtek\Audio\HDA\RAVBg64.exe" /MAXX6
+"C:\Program Files\Realtek\Audio\HDA\RAVBg64.exe" /IM
+"C:\Program Files\Realtek\Audio\HDA\RtkNGUI64.exe" -s
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\TRACKPADPLUSPLUS
+C:\Program Files\TrackpadPlusPlus\Trackpad++ Control Module.exe
+:startthis
 REM https://stackoverflow.com/questions/7044985/how-can-i-auto-elevate-my-batch-file-so-that-it-requests-from-uac-administrator
 REM selfelevated
 @echo off
