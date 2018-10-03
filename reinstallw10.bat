@@ -1,40 +1,4 @@
-﻿goto:startthis
-https://www.cnet.com/forums/discussions/how-to-delete-a-program-that-won-t-uninstall-264878/
-Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
-CNXT_AUDIO_HDA; CxAudMsg; DTSConfig; Flow; HP-NB-AIO; MicTray; SFPreset; SSPConfig (DTSCONFIG; Install; SA3; Waves\\MaxxAudio)
-remove conexant
-C:\Windows\Program Files\CONEXANT 
-C:\Windows\Program Files\Waves 
-C:\Windows\CxSvc
-C:\Windows\CxAudioSvc
-C:\Windows\CxMonSvc
-C:\Windows\CxUtilSvc
-C:\Windows\System32\CxAudMsg64
-"C:\Program Files\Conexant\MicTray\MicTray64.exe"
-"C:\Program Files\Waves\MaxxAudio\WavesSvc64.exe"
-Services: Waves Audio Ltd.: Waves System Service ;; 
-Conexant Systems, Inc, : Conexant Audio Message Service CxAudioSvc CxMonSvc CxUtilSvc
-Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CxMonSvc  
-Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CxUtilSvc 
-Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CxAudMsg 
-Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CxAudioSvc
-Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WavesSysSvc
-https://arstechnica.com/civis/viewtopic.php?t=1298749
-REM bcdedit /set pciexpress forcedisable
-remove REALTEKHD
-"C:\Program Files\Realtek\Audio\HDA\RAVBg64.exe" /MAXX4
-"C:\Program Files\Realtek\Audio\HDA\RAVBg64.exe" /MAXX6
-"C:\Program Files\Realtek\Audio\HDA\RAVBg64.exe" /IM
-"C:\Program Files\Realtek\Audio\HDA\RtkNGUI64.exe" -s
-C:\Program Files\TrackpadPlusPlus\Trackpad++ Control Module.exe
-Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVBg
-Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVBg_MAXX6
-Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVBg_PushButton
-Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVCpl
-Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\TRACKPADPLUSPLUS
-:startthis
-REM https://stackoverflow.com/questions/7044985/how-can-i-auto-elevate-my-batch-file-so-that-it-requests-from-uac-administrator
+﻿REM https://stackoverflow.com/questions/7044985/how-can-i-auto-elevate-my-batch-file-so-that-it-requests-from-uac-administrator
 REM selfelevated
 @echo off
 setlocal enabledelayedexpansion enableextensions
@@ -1180,3 +1144,43 @@ projectbatterylabeling
 project3dprinterusbcover
 project3dpspecs
 goto:EOF
+
+
+:startthis
+https://www.cnet.com/forums/discussions/how-to-delete-a-program-that-won-t-uninstall-264878/
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+CNXT_AUDIO_HDA; CxAudMsg; DTSConfig; Flow; HP-NB-AIO; MicTray; SFPreset; SSPConfig (DTSCONFIG; Install; SA3; Waves\\MaxxAudio)
+remove conexant
+C:\Windows\Program Files\CONEXANT 
+C:\Windows\Program Files\Waves 
+C:\Windows\CxSvc
+C:\Windows\CxAudioSvc
+C:\Windows\CxMonSvc
+C:\Windows\CxUtilSvc
+C:\Windows\System32\CxAudMsg64
+"C:\Program Files\Conexant\MicTray\MicTray64.exe"
+"C:\Program Files\Waves\MaxxAudio\WavesSvc64.exe"
+Services: Waves Audio Ltd.: Waves System Service ;; 
+Conexant Systems, Inc, : Conexant Audio Message Service CxAudioSvc CxMonSvc CxUtilSvc
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CxMonSvc  
+Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CxUtilSvc 
+Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CxAudMsg 
+Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CxAudioSvc
+Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WavesSysSvc
+https://arstechnica.com/civis/viewtopic.php?t=1298749
+REM bcdedit /set pciexpress forcedisable
+remove REALTEKHD
+"C:\Program Files\Realtek\Audio\HDA\RAVBg64.exe" /MAXX4
+"C:\Program Files\Realtek\Audio\HDA\RAVBg64.exe" /MAXX6
+"C:\Program Files\Realtek\Audio\HDA\RAVBg64.exe" /IM
+"C:\Program Files\Realtek\Audio\HDA\RtkNGUI64.exe" -s
+C:\Program Files\TrackpadPlusPlus\Trackpad++ Control Module.exe
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVBg
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVBg_MAXX6
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVBg_PushButton
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RtHDVCpl
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\TRACKPADPLUSPLUS
+goto:EOF
+#:startthis
+
